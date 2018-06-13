@@ -1,0 +1,261 @@
+#include<iostream>
+#include<algorithm>
+using namespace std;
+
+class Polynomial {
+
+    public:
+    int *degCoeff;
+    int capacity;
+    Polynomial()
+    {
+     capacity=100;
+     degCoeff=new int[capacity];
+     for(int i=0;i<capacity;i++)
+     {
+         degCoeff[i]=0;
+     }
+    }
+    Polynomial(Polynomial const& p1)
+    {
+        capacity=p1.capacity;
+        for(int i=0;i<p1.capacity;i++)
+        {
+            degCoeff[i]=p1.degCoeff[i];
+        }
+
+    }
+
+    void setCoefficient(int degree,int coeff)
+    {
+        if(degree<capacity-1)
+        {
+            degCoeff[degree]=coeff;
+        }
+        else
+        {
+            int diff=degree-capacity;
+            int new_capacity=capacity+diff+1;
+            int *new_degCoeff=new int[new_capacity];
+            for(int i=0;i<new_capacity;i++)
+            {
+                if(i<capacity)
+                {
+                    new_degCoeff[i]=degCoeff[i];
+                }
+                else
+                {
+                    new_degCoeff[i]=0;
+                }
+            }
+            new_degCoeff[degree]=coeff;
+            degCoeff=new_degCoeff;
+            capacity=new_capacity;
+        }
+
+    }
+    /// overloading...
+    Polynomial operator +(Polynomial const &p1) const
+    {
+        int max_len=max(p1.capacity,capacity);
+        int min_len=min(p1.capacity,capacity);
+        int *new_ans=new int[max_len];
+        int i=0;
+        for(;i<min_len;i++)
+        {
+            new_ans[i]=p1.degCoeff[i]+degCoeff[i];
+        }
+        while(i<capacity)
+        {
+            new_ans[i]=degCoeff[i];
+            i++;
+        }
+        while(i<p1.capacity)
+        {
+            new_ans[i]=p1.degCoeff[i];
+            i++;
+        }
+        Polynomial pnew;
+        int k=i;
+        for(int k=0;k<i;k++)
+        {
+            pnew.setCoefficient(k,new_ans[k]);
+        }
+        return pnew;
+    }
+    Polynomial operator -(Polynomial const &p1) const
+    {
+         int max_len=max(p1.capacity,capacity);
+        int min_len=min(p1.capacity,capacity);
+        int *new_ans=new int[max_len];
+        int i=0;
+        for(;i<min_len;i++)
+        {
+            new_ans[i]=degCoeff[i]-p1.degCoeff[i];
+        }
+        while(i<capacity)
+        {
+            new_ans[i]=degCoeff[i];
+            i++;
+        }
+        while(i<p1.capacity)
+        {
+            new_ans[i]=0-p1.degCoeff[i];
+            i++;
+        }
+        Polynomial pnew;
+        int k=i;
+        for(int k=0;k<i;k++)
+        {
+            pnew.setCoefficient(k,new_ans[k]);
+        }
+        return pnew;
+    }
+     Polynomial operator *(Polynomial const &p1) const
+    {
+
+        int *new_degCoeff=new int[p1.capacity+capacity];
+        for(int i=0;i<p1.capacity+capacity;i++)
+        {
+            new_degCoeff[i]=0;
+        }
+        for(int i=0;i<capacity;i++)
+        {
+            for(int j=0;j<p1.capacity;j++)
+            {
+                new_degCoeff[i+j]=new_degCoeff[i+j]+(degCoeff[i]*p1.degCoeff[j]);
+            }
+        }
+        Polynomial pnew;
+        pnew.capacity=p1.capacity+capacity;
+        pnew.degCoeff=new_degCoeff;
+        return pnew;
+
+    }
+    Polynomial& operator =(Polynomial const& p1)
+    {
+        this->capacity=p1.capacity;
+        for(int i=0;i<capacity;i++)
+        {
+            degCoeff[i]=p1.degCoeff[i];
+        }
+        return *this;
+    }
+
+    void print() const
+    {
+        for(int i=0;i<this->capacity;i++)
+        {
+            if(degCoeff[i]!=0)
+            cout<<degCoeff[i]<<"x"<<i<<" ";
+        }
+        cout<<endl;
+    }
+
+
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int main()
+{
+    int count1,count2,choice;
+    cin >> count1;
+
+    int *degree1 = new int[count1];
+    int *coeff1 = new int[count1];
+
+    for(int i=0;i < count1; i++) {
+        cin >> degree1[i];
+    }
+
+    for(int i=0;i < count1; i++) {
+        cin >> coeff1[i];
+    }
+
+    Polynomial first;
+    for(int i = 0; i < count1; i++){
+        first.setCoefficient(degree1[i],coeff1[i]);
+    }
+
+    cin >> count2;
+
+    int *degree2 = new int[count2];
+    int *coeff2 = new int[count2];
+
+    for(int i=0;i < count2; i++) {
+        cin >> degree2[i];
+    }
+
+    for(int i=0;i < count2; i++) {
+        cin >> coeff2[i];
+    }
+
+    Polynomial second;
+    for(int i = 0; i < count2; i++){
+        second.setCoefficient(degree2[i],coeff2[i]);
+    }
+
+    cin >> choice;
+
+    Polynomial result;
+    switch(choice){
+            // Add
+        case 1:
+            result = first + second;
+            result.print();
+            break;
+            // Subtract
+        case 2 :
+            result = first - second;
+            result.print();
+            break;
+            // Multiply
+        case 3 :
+            result = first * second;
+            result.print();
+            break;
+
+        case 4 : // Copy constructor
+        {
+            Polynomial third(first);
+            if(third.degCoeff == first.degCoeff) {
+                cout << "false" << endl;
+            }
+            else {
+                cout << "true" << endl;
+            }
+            break;
+        }
+
+        case 5 : // Copy assignment operator
+        {
+            Polynomial fourth(first);
+            if(fourth.degCoeff == first.degCoeff) {
+                cout << "false" << endl;
+            }
+            else {
+                cout << "true" << endl;
+            }
+            break;
+        }
+
+    }
+
+    return 0;
+}
