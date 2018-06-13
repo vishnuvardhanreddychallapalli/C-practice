@@ -1,0 +1,159 @@
+#include<iostream>
+using namespace std;
+class Myfraction
+{
+    int numerator;
+    int denominator;
+
+public:
+    static int num_of_fractions_created;
+    Myfraction()
+    {
+        num_of_fractions_created++;
+      //  cout<<"Default constructor called"<<endl;
+    }
+    Myfraction(int numerator,int denominator)
+    {
+        num_of_fractions_created++;
+      //  cout<<"Parameterized constructor called"<<endl;
+        this->numerator=numerator;
+        this->denominator=denominator;
+    }
+    Myfraction(Myfraction const &f)
+    {
+        num_of_fractions_created++;
+      //  cout<<"Hey copy constructor called"<<endl;
+       this->numerator=f.numerator;
+       this->denominator=f.denominator;
+    }
+    void print() const
+    {
+        if(this->numerator==this->denominator)
+        {
+            cout<<numerator<<endl;
+            return;
+        }
+        cout<<"The Fraction is :   ";
+        cout<<numerator<<" / "<<denominator<<endl;
+    }
+    void simplify()
+    {
+        int gcd=1;
+        int small=min(numerator,denominator);
+        for(int i=1;i<=small;i++)
+        {
+            if(numerator%i ==0 && denominator%i ==0)
+            {
+                gcd=i;
+            }
+        }
+        numerator=numerator/gcd;
+        denominator=denominator/gcd;
+    }
+    void add(Myfraction f1)
+    {
+        int num=(this->numerator*f1.denominator)+(f1.numerator*this->denominator);
+        int den=(this->denominator*f1.denominator);
+        this->numerator=num;
+        this->denominator=den;
+        simplify();
+    }
+    void multiply(Myfraction f1)
+    {
+        int num=f1.numerator*this->numerator;
+        int den=f1.denominator*this->denominator;
+        this->numerator=num;
+        this->denominator=den;
+        simplify();
+    }
+    Myfraction multiply(Myfraction const& f1) const
+    {
+        int num=f1.numerator*this->numerator;
+        int den=f1.denominator*this->denominator;
+        Myfraction fnew(num,den);
+        fnew.simplify();
+        return fnew;
+    }
+    Myfraction add(Myfraction const &f1) const
+    {
+       int num=(this->numerator*f1.denominator)+(f1.numerator*this->denominator);
+       int den=(this->denominator*f1.denominator);
+        Myfraction fnew(num,den);
+        fnew.simplify();
+        return fnew;
+
+    }
+    /// Operator-overloading......
+    Myfraction operator +(Myfraction f1) const
+    {
+        int num=(this->numerator*f1.denominator)+(f1.numerator*this->denominator);
+        int den=(this->denominator*f1.denominator);
+        Myfraction fnew(num,den);
+        fnew.simplify();
+        return fnew;
+    }
+    Myfraction operator *(Myfraction f1) const
+    {
+        int num=f1.numerator*this->numerator;
+        int den=f1.denominator*this->denominator;
+        Myfraction fnew(num,den);
+        fnew.simplify();
+        return fnew;
+    }
+    bool operator ==(Myfraction f1) 
+    {
+         this->simplify();
+         f1.simplify();
+         return (this->numerator==f1.numerator && this->denominator==f1.denominator);
+    }
+    /// Pre-increment operator....
+    Myfraction& operator ++()
+    {
+        int num=numerator+denominator;
+        this->numerator=num;
+        simplify();
+        return *this;
+    }
+    /// post-increment operator.....
+    Myfraction operator ++(int)
+    {
+        Myfraction fnew=Myfraction(numerator,denominator);
+        int num=this->numerator+this->denominator;
+        this->numerator=num;
+        return fnew;
+    }
+    void set_numerator(int num)
+    {
+        /// numerator=num; (both are equal)....
+        this->numerator=num;
+    }
+    void set_denominator(int num)
+    {
+        if(num==0)
+            return ;
+        denominator=num;
+    }
+    int get_numerator()
+    {
+        return numerator;
+    }
+    int get_denominator()
+    {
+        return denominator;
+    }
+    static int total_fractions()
+    {
+        return no_of_fractions_created;
+    }
+
+
+};
+int Myfraction :: num_of_fractions_created=0;
+int main()
+{
+    Myfraction f1(3,4);
+    Myfraction f2(3,4);
+    cout<<Myfraction::num_of_fractions_created<<endl;
+    return 0;
+
+}
