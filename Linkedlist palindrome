@@ -1,0 +1,110 @@
+#include <iostream>
+using namespace std;
+class Node
+{
+    public:
+    int data;
+    Node *next;
+    Node(int data)
+    {
+        this->data=data;
+        next=NULL;
+    }
+    
+};
+   void print(Node *head) 
+    {
+       Node *temp=head;
+       while(temp!=NULL)
+       {
+           cout<<temp->data<<" ";
+           temp=temp->next;
+       }
+    }
+    Node *take_input()
+    {
+        // bool first_run=true;
+         int data;
+         cin>>data;
+         Node *head=NULL,*tail=NULL;
+         while(data!=-1)
+         {
+             Node *n1=new Node(data);
+             if(head==NULL)
+             {
+                 head=n1;
+                 tail=n1;
+             }
+             else
+             {
+                 tail->next=n1;
+                 tail=n1;
+             }
+          cin>>data;
+         }
+        return head;
+    }
+    int find_length(Node *head)
+    {
+        Node *temp=head;
+        int count=0;
+        while(temp!=NULL)
+        {
+            count+=1;
+            temp=temp->next;
+        }
+        
+        return count;
+    }
+    Node *find_mid(Node *head)
+    {
+        Node *temp=head;
+        int len=find_length(head);
+      //  cout<<len<<endl;
+        int mid_size=(len%2==0)?len/2:(len/2)+1;
+        int index=1;
+        while(index<=mid_size)
+        {
+            index++;
+            temp=temp->next;
+        }
+        return temp;
+        
+    }
+    Node *reverse(Node *head)
+    {
+        Node*prev_ptr=NULL,*curr_ptr=head,*next_ptr=head->next;
+        while(curr_ptr!=NULL)
+        {
+            curr_ptr->next=prev_ptr;
+            prev_ptr=curr_ptr;
+            curr_ptr=next_ptr;
+            if(next_ptr!=NULL)
+            next_ptr=next_ptr->next;
+        }
+       head=prev_ptr;
+       return head;
+    }
+  bool check_palindrome(Node *first_part,Node *second_part)
+  {
+        while(first_part!=NULL && second_part!=NULL)
+      {
+       if(first_part->data!=second_part->data)
+       {
+           return false;
+       }
+       first_part=first_part->next;
+       second_part=second_part->next;
+     }
+     return true;
+  }
+int main() {
+   Node *head=take_input();
+   Node *mid=find_mid(head);
+   mid=reverse(mid);
+   bool ans=check_palindrome(head,mid);
+   cout<<ans<<endl;
+   
+   
+  
+}
