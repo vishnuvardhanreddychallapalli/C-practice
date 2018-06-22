@@ -1,0 +1,91 @@
+#include<iostream>
+#include<vector>
+#include<queue>
+#include "TreeNode.h"
+using namespace std;
+TreeNode<int> *TakeInput_LevelWise()
+{
+    queue<TreeNode<int>*> q;
+    cout<<"Enter the value of the root data:"<<endl;
+    int data;
+    cin>>data;
+    TreeNode<int> *root=new TreeNode<int>(data);
+    q.push(root);
+    while(!q.empty())
+    {
+        TreeNode<int> *root1=q.front();
+        q.pop();
+        cout<<"Enter the no_of_children for :"<<root1->data<<endl;
+        int no_of_children;
+        cin>>no_of_children;
+        for(int i=0;i<no_of_children;i++)
+        {
+            cout<<"Enter the"<<i+1<<"th  children data of"<<root1->data;
+            int child_data;
+            cin>>child_data;
+            TreeNode<int> *childroot=new TreeNode<int>(child_data);
+            q.push(childroot);
+            root1->children.push_back(childroot);
+        }
+
+    }
+    return root;
+}
+TreeNode<int> *TakeInput()
+{
+    cout<<"Enter the value of data"<<endl;
+    int data;
+    cin>>data;
+    TreeNode<int> *root=new TreeNode<int>(data);
+    cout<<"Enter the number of children"<<endl;
+    int no_of_child;
+    cin>>no_of_child;
+    for(int i=0;i<no_of_child;i++)
+    {
+       cout<<"Enter the "<<i+1<<"th child of"<<root->data<<endl;
+       TreeNode<int> *root1= TakeInput();
+       root->children.push_back(root1);
+    }
+    return root;
+}
+void PrintTree(TreeNode<int> *root)
+{
+    cout<<root->data<<":";
+    for(int i=0;i<root->children.size();i++)
+    {
+        cout<<root->children.at(i)->data<<",";
+    }
+    cout<<endl;
+    for(int i=0;i<root->children.size();i++)
+    {
+        PrintTree(root->children.at(i));
+    }
+
+}
+void PrintTree_Levelwise(TreeNode<int> *root)
+{
+    if(root==NULL)
+        return;
+    queue<TreeNode<int>*> q;
+    q.push(root);
+    while(!q.empty())
+    {
+        TreeNode<int> *root1=q.front();
+        q.pop();
+        cout<<root1->data<<":";
+        for(int i=0;i<root1->children.size();i++)
+        {
+            cout<<root1->children.at(i)->data<<",";
+            q.push(root1->children.at(i));
+        }
+        cout<<endl;
+    }
+}
+
+int main()
+{
+    TreeNode<int> *root=TakeInput_LevelWise();
+    PrintTree(root);
+    cout<<endl;
+    PrintTree_Levelwise(root);
+}
