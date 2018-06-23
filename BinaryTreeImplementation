@@ -1,0 +1,127 @@
+#include<iostream>
+#include<queue>
+using namespace std;
+template <typename T>
+class BinaryTree
+{
+    public:
+    T data;
+    BinaryTree *left;
+    BinaryTree *right;
+    BinaryTree(T element)
+    {
+        data=element;
+        this->left=NULL;
+        this->right=NULL;
+    }
+};
+BinaryTree<int>* TakeInput() /// Taking input in the preorder way.....or depth first way.... by using -1 as a delimiter..
+{
+    int data;
+    cout<<"Please enter the  data"<<endl;
+    cin>>data;
+    if(data==-1)
+        return NULL;
+    BinaryTree<int> *root=new BinaryTree<int>(data);
+    cout<<"You are entering data for left_child:"<<endl;
+    BinaryTree<int> *leftChild=TakeInput();
+    cout<<"You are entering data for right_child:"<<endl;
+    BinaryTree<int> *rightChild=TakeInput();
+    root->left=leftChild;
+    root->right=rightChild;
+    return root;
+}
+void printTree(BinaryTree<int> *root)
+{
+    if(root==NULL)
+        return ;
+     cout<<root->data<<":";
+     if(root->left!=NULL)
+     {
+         cout<<"L "<<root->left->data<<",";
+     }
+     if(root->right!=NULL)
+     {
+         cout<<"R "<<root->right->data;
+     }
+     cout<<endl;
+     printTree(root->left);
+     printTree(root->right);
+
+}
+BinaryTree<int>* TakeInputLevelWise()
+{
+    cout<<"Please Enter the root_data:"<<endl;
+     int data;
+     cin>>data;
+     if(data==-1)
+     {
+         return NULL;
+     }
+     BinaryTree<int> *root=new BinaryTree<int>(data);
+     queue<BinaryTree<int>*> q;
+     q.push(root);
+     while(!q.empty())
+     {
+         BinaryTree<int> *looper=q.front();
+         q.pop();
+         cout<<"Please Enter the left Child data for:"<<looper->data<<endl;
+         cin>>data;
+         if(data==-1)
+            looper->left=NULL;
+         else
+         {
+           BinaryTree<int> *left_node=new BinaryTree<int>(data);
+           q.push(left_node);
+           looper->left=left_node;
+         }
+         cout<<"Please Enter the right Child data for:"<<looper->data<<endl;
+         cin>>data;
+         if(data==-1)
+            looper->right=NULL;
+         else
+         {
+              BinaryTree<int> *right_node=new BinaryTree<int>(data);
+              looper->right=right_node;
+              q.push(right_node);
+         }
+     }
+     return root;
+}
+void printTree_LevelWise(BinaryTree<int> *root)
+{
+    if(root==NULL)
+        return;
+    queue<BinaryTree<int>*> q;
+    q.push(root);
+    while(!q.empty())
+    {
+        BinaryTree<int> *looper=q.front();
+        q.pop();
+        if(looper==NULL)
+        return;
+       cout<<looper->data<<" :";
+       if(looper->left!=NULL)
+       {
+          cout<<"L "<<looper->left->data;
+          q.push(looper->left);
+       }
+       if(looper->right!=NULL)
+       {
+           cout<<" R"<<looper->right->data;
+           q.push(looper->right);
+       }
+       cout<<endl;
+    }
+}
+
+int main()
+{
+    BinaryTree<int> *root=TakeInputLevelWise();
+    cout<<endl;
+    cout<<endl;
+    printTree(root);
+    cout<<endl;
+    cout<<endl;
+    printTree_LevelWise(root);
+}
