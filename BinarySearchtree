@@ -1,72 +1,224 @@
-#include "BinaryTree.h"
-#include<queue>
-class BST
-{
-    public:
-    BinaryTreeNode<int> *root;
-    BST()
-    {
-        root=NULL;
-    }
-    private:
-    BinaryTreeNode<int>* insert_at_correct_postion(int data,BinaryTreeNode<int> *root)
-    {
-        if(root==NULL)
-        {
-            BinaryTreeNode<int> *ans=new BinaryTreeNode<int>(data);
-            root=ans;
-            return root;
-        }
-        if(root->data>data)
-        {
-            /// Insert all elements in left subtree...
-            root->left=insert_at_correct_postion(data,root->left);
-            return root;
-        }
-        else if(root->data<data)
-        {
-            root->right=insert_at_correct_postion(data,root->right);
-             return root;
-        }
-    }
-    void printer(BinaryTreeNode<int> *root)
-    {
-        if(root==NULL)
-            return;
-        queue<BinaryTreeNode<int>*> q;
-        q.push(root);
-        q.push(NULL);
-        while(!q.empty())
-        {
-            BinaryTreeNode<int> *ans=q.front();
-            q.pop();
-            if(ans==NULL)
-            {
-                cout<<endl;
-                if(q.empty())
-                {
-                    break;
-                }
-                q.push(NULL);
-            }
-            if(ans!=NULL)
-            {
-              cout<<ans->data<<" ";
-              if(ans->left!=NULL)
-              q.push(ans->left);
-              if(ans->right!=NULL)
-               q.push(ans->right);
-            }
-        }
-    }
-    public:
-    void insert(int data)
-    {
-       BinaryTreeNode<int>*final_ans= insert_at_correct_postion(data,root);
-       root=final_ans;
-    }
-    void print()
-    {
-        printer(root);
+#include<climits>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+template <typename T>
+class BinaryTreeNode {
+public:
+    T data;
+    BinaryTreeNode<T> *left;
+    BinaryTreeNode<T> *right;
+
+    BinaryTreeNode(T data) {
+        this->data = data;
+        this->left = NULL;
+        this->right = NULL;
     }
 };
+class BST {
+  public:
+    BinaryTreeNode<int >*root;
+    BST()
+    {
+      root=NULL;
+    }
+  public:
+
+
+   bool check_data(BinaryTreeNode<int> *root,int data)
+   {
+        if(root==NULL)
+           return false;
+        if(root->data==data)
+        {
+          return true;
+        }
+       if(root->data<data)
+       {
+         bool right_ans=check_data(root->right,data);
+         return right_ans;
+       }
+      if(root->data>data)
+      {
+        bool left_ans=check_data(root->left,data);
+        return left_ans;
+      }
+   }
+  void recursive_print_tree(BinaryTreeNode<int>* root)
+  {
+    if(root==NULL)
+           return;
+     cout<<root->data<<":";
+     if(root->left!=NULL)
+     {
+        cout<<"L:"<<root->left->data<<",";
+     }
+     if(root->right!=NULL)
+     {
+       cout<<"R:"<<root->right->data;
+     }
+     cout<<endl;
+    recursive_print_tree(root->left);
+    recursive_print_tree(root->right);
+  }
+
+  public:
+      BinaryTreeNode<int>* search_and_delete(BinaryTreeNode<int> *root,int key)
+      {
+          if(root==NULL)
+              return NULL;
+           if(root->data==key)
+           {
+              // cout<<"I came here but not deleted why....mr"<<root->data<<endl;
+               root=NULL;
+               return root;
+
+            }
+           if(root->data<key)
+           {
+               root->right=search_and_delete(root->right,key);
+               return root;
+           }
+           else
+           {
+               root->left= search_and_delete(root->left,key);
+               return root;
+           }
+      }
+      int find_min(BinaryTreeNode<int> *root)
+      {
+        //  cout<<"I entered_find_min_fiction"<<endl;
+          if(root==NULL)
+             return INT_MAX;
+           int left_ans=find_min(root->left);
+           int right_ans=find_min(root->right);
+           int final_Ans=min(root->data,min(left_ans,right_ans));
+          // cout<<final_Ans<<endl;
+           return final_Ans;
+      }
+      BinaryTreeNode<int> * insert_tree(BinaryTreeNode<int> *root,int data)
+      {
+         if(root==NULL)
+         {
+             BinaryTreeNode<int> *ans=new BinaryTreeNode<int>(data);
+             root=ans;
+             return root;
+         }
+         if(root->data<=data)
+         {
+             BinaryTreeNode<int> *ans=insert_tree(root->right,data);
+             root->right=ans;
+             return root;
+         }
+         if(root->data>data)
+         {
+             BinaryTreeNode<int> *ans=insert_tree(root->left,data);
+             root->left=ans;
+             return root;
+         }
+      }
+
+   BinaryTreeNode<int> *deleteData_in_tree(BinaryTreeNode<int> *root,int data)
+   {
+           if(root==NULL)
+               return root;
+            if(root->data==data)
+            {
+                ///case1 : if the root is a leaf.....
+                if(root->left==NULL && root->right==NULL)
+                {
+                     //root=NULL;
+                    return NULL;
+                }
+                /// case2 :
+                if(root->left==NULL && root->right!=NULL)
+                {
+                    return root->right;
+                }
+                /// case3:
+                if(root->left!=NULL && root->right==NULL)
+                {
+                    return root->left;
+                }
+                /// case4:
+                if(root->left!=NULL && root->right!=NULL)
+                {
+                    /// step 1: find minimum at the left subtree or maximum in the right sub tree...
+                    /// i want to find the maximum in the right subtree...
+                    int max_ans=find_min(root->right);
+                    //cout<<"The maximum value is max_ans:"<<max_ans<<endl;
+                    BinaryTreeNode<int> *ans=search_and_delete(root->right,max_ans);
+                    root->right=ans;
+                    root->data=max_ans;
+                    return root;
+                }
+
+            }
+            if(root->data<data)
+            {
+                BinaryTreeNode<int> *ans=deleteData_in_tree(root->right,data);
+                root->right=ans;
+                return root;
+            }
+            else{
+                BinaryTreeNode<int> *ans=deleteData_in_tree(root->left,data);
+                root->left=ans;
+                return root;
+            }
+   }
+
+    void insert(int data)
+    {
+      // cout<<"Called insert_finction"<<endl;
+        BinaryTreeNode<int> *ans=insert_tree(root,data);
+        //cout<<" I printed_value"<<endl;
+        root=ans;
+        //cout<<"Value inserted_success..."<<endl;
+    }
+    void deleteData(int data)
+    {
+       BinaryTreeNode<int> *ans=deleteData_in_tree(root,data);
+       root=ans;
+    }
+    bool hasData(int data)
+    {
+      bool ans=check_data(root,data);
+      return ans;
+    }
+   void printTree()
+   {
+     recursive_print_tree(root);
+   }
+
+};
+
+int main(){
+    BST *tree = new BST();
+    int choice, input;
+    while(true){
+        cin>>choice;
+        switch(choice){
+            case 1:
+                cin >> input;
+                tree->insert(input);
+                break;
+            case 2:
+                cin >> input;
+                tree->deleteData(input);
+                break;
+            case 3:
+                cin >> input;
+                if(tree->hasData(input)) {
+                    cout << "true" << endl;
+                }
+                else {
+                    cout << "false" << endl;
+                }
+                break;
+            default:
+                tree->printTree();
+                return 0;
+                break;
+        }
+    }
+}
