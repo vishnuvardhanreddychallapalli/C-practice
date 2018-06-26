@@ -1,0 +1,72 @@
+#include "BinaryTree.h"
+#include<queue>
+class BST
+{
+    public:
+    BinaryTreeNode<int> *root;
+    BST()
+    {
+        root=NULL;
+    }
+    private:
+    BinaryTreeNode<int>* insert_at_correct_postion(int data,BinaryTreeNode<int> *root)
+    {
+        if(root==NULL)
+        {
+            BinaryTreeNode<int> *ans=new BinaryTreeNode<int>(data);
+            root=ans;
+            return root;
+        }
+        if(root->data>data)
+        {
+            /// Insert all elements in left subtree...
+            root->left=insert_at_correct_postion(data,root->left);
+            return root;
+        }
+        else if(root->data<data)
+        {
+            root->right=insert_at_correct_postion(data,root->right);
+             return root;
+        }
+    }
+    void printer(BinaryTreeNode<int> *root)
+    {
+        if(root==NULL)
+            return;
+        queue<BinaryTreeNode<int>*> q;
+        q.push(root);
+        q.push(NULL);
+        while(!q.empty())
+        {
+            BinaryTreeNode<int> *ans=q.front();
+            q.pop();
+            if(ans==NULL)
+            {
+                cout<<endl;
+                if(q.empty())
+                {
+                    break;
+                }
+                q.push(NULL);
+            }
+            if(ans!=NULL)
+            {
+              cout<<ans->data<<" ";
+              if(ans->left!=NULL)
+              q.push(ans->left);
+              if(ans->right!=NULL)
+               q.push(ans->right);
+            }
+        }
+    }
+    public:
+    void insert(int data)
+    {
+       BinaryTreeNode<int>*final_ans= insert_at_correct_postion(data,root);
+       root=final_ans;
+    }
+    void print()
+    {
+        printer(root);
+    }
+};
