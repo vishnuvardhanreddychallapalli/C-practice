@@ -1,3 +1,6 @@
+#include<string>
+#include<iostream>
+using namespace std;
 template <typename V>
 class MapNode
 {
@@ -27,15 +30,16 @@ class ourmap
         curr_size=0;
         no_of_buckets=5;
         buckets=new MapNode<V>*[no_of_buckets];
-        ourmap()
-        {
+
             for(int i=0;i<no_of_buckets;i++)
-                buckets[i]=NULL;
-        }
+            {
+                 buckets[i]=NULL;
+            }
+
     }
     ~ourmap()
     {
-        
+
         for(int i=0;i<no_of_buckets;i++)
         {
             delete buckets[i];
@@ -54,14 +58,42 @@ class ourmap
              p=p*31;
              p=p%no_of_buckets;
          }
+         hash_code%=no_of_buckets;
          return hash_code;
+     }
+     public:
+     void rehash()
+     {
+         MapNode<V> **temp=buckets;
+         int curr_buckets=curr_size;
+         buckets=NULL;
+         this->buckets=new MapNode<V>*[2*no_of_buckets];
+         for(int i=0;i<2*no_of_buckets;i++)
+         {
+            this->buckets[i]=NULL;
+         }
+         this->curr_size=0;
+           this->no_of_buckets=2*no_of_buckets;
+         for(int i=0;i<curr_buckets;i++)
+         {
+             MapNode<V> *curr=temp[i];
+             while(curr!=NULL)
+             {
+                 //cout<<"I am inserting :"<<curr->key<<" : "<<curr->value<<endl;
+                 insert_key_value(curr->key,curr->value);
+                 curr=curr->next;
+             }
+         }
+
      }
     public:
     void insert_key_value(string key,V value)
     {
+        cout<<"The initial count is :  "<<curr_size<<endl;
         /// Two steps first is find the hashcode and pass it through a compressor to get the bucket Index..
         /// Once you get the bucket Index just push in to the map...
         int buckets_index=get_bucket_index(key);
+        //cout<<"The bucket_index for "<<key<<" is"<<buckets_index<<endl;
         /// Just before inserting the element in the hash map please check if the element key is already present or not..
         MapNode<V> *head=buckets[buckets_index];
         while(head!=NULL)
@@ -72,20 +104,31 @@ class ourmap
                 head->value=value;
                 return;
             }
-            
+
             head=head->next;
         }
         /// If element not found insert the element successfully...
-        head=buckets[bucket_index];
-        MapNode<V> *newnode(key,value);
+        head=buckets[buckets_index];
+        MapNode<V> *new_node=new MapNode<V>(key,value);
+        //cout<<new_node->key<<": "<<new_node->value<<endl;
         new_node->next=head;
         head=new_node;
+        buckets[buckets_index]=head;
         curr_size++;
+        double load_factor=(1.0*curr_size)/no_of_buckets;
+        if(load_factor>0.7)
+        {
+            cout<<"The load factor became.... "<<load_factor<<endl;
+            rehash();
+            //cout<<"Rehash applied"<<endl;
+        }
+
+       // cout<<"Insertion is successfuel"<<endl;
         /// To avoid collision i am using closed addressing here by forming a linked list...
     }
     V delete_key(string key)
     {
-        
+
         ///When deleting a key we need to check first if the key is present or not if key is found delete it else return 0 as a token of unsuccesful delete..
        int bucket_index=get_bucket_index(key);
        MapNode<V> *head=buckets[bucket_index];
@@ -114,21 +157,24 @@ class ourmap
                    return value;
                }
            }
-           
+
            prev=head;
            head=head->next;
-           
+
        }
        /// Element not found... so as token of unsuccessful delete i am returning zero...
        return 0;
-       
+
     }
     V search_and_find(string key)
     {
         int bucket_index=get_bucket_index(key);
+       // cout<<"Got the bucket_index for key: "<<key<<" "<<bucket_index<<endl;
         MapNode<V> *head=buckets[bucket_index];
+       // cout<<"The nul is"<<head<<endl;
         while(head!=NULL)
         {
+          //  cout<<" i CAME HERE"<<endl;
             if(head->key==key)
             {
                 return head->value;
@@ -159,9 +205,61 @@ class ourmap
     }
     int bucket_size()
     {
-        
+
         return no_of_buckets;
     }
-    
-    
+
+
 };
+int main()
+{
+    ourmap<int> om;
+    om.insert_key_value("124",100);
+    om.insert_key_value("134",200);
+    om.insert_key_value("199",900);
+    om.insert_key_value("499",999);
+    om.insert_key_value("224",100);
+    om.insert_key_value("324",700);
+    om.insert_key_value("24",900);
+    om.insert_key_value("424",1000);
+    om.insert_key_value("524",1100);
+    om.insert_key_value("624",1700);
+    om.insert_key_value("724",1900);
+    om.insert_key_value("824",100);
+    om.insert_key_value("324",-100);
+
+    for(int i=0;i<om.no_of_buckets;i++)
+    {
+        MapNode<int> *new_node=om.buckets[i];
+        //cout<<new_node<<endl;
+        while(new_node!=NULL)
+        {
+            cout<<new_node->key<<": "<<new_node->value<<endl;
+            new_node=new_node->next;
+        }
+    }
+    cout<<"Total_no_of_elements..."<<om.curr_size<<endl;
+    om.delete_key("324");
+    om.delete_key("199");
+    cout<<endl;
+    cout<<endl;
+    for(int i=0;i<om.no_of_buckets;i++)
+    {
+        MapNode<int> *new_node=om.buckets[i];
+        //cout<<new_node<<endl;
+        while(new_node!=NULL)
+        {
+            cout<<new_node->key<<": "<<new_node->value<<endl;
+            new_node=new_node->next;
+        }
+    }
+     cout<<"Total_no_of_elements..."<<om.curr_size<<endl;
+     cout<<endl;
+     cout<<"I am searching for   "<<om.search_and_find("199")<<endl;
+     cout<<"I am searching for   "<<om.search_and_find("724")<<endl;
+     cout<<"I am searching for   "<<om.search_and_find("424")<<endl;
+     cout<<"I am searching for   "<<om.search_and_find("524")<<endl;
+
+    return 0;
+}
+
