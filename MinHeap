@@ -1,0 +1,119 @@
+#include<iostream>
+#include<algorithm>
+using namespace std;
+template<typename T>
+class MinHeap
+{
+   public:
+       T *arr;
+       int nextIndex;
+       int max_size;
+    MinHeap(int max_size)
+    {
+        this->max_size=max_size;
+        this->nextIndex=0;
+        arr=new T[max_size];
+        cout<<"MIN-HEAP of size  "<<max_size<<"created succesfully..."<<endl;
+    }
+   private:
+       void heapify_up(T *arr,int index)
+       {
+           int root_index=(index-1)/2;
+           if(root_index==index)
+               return;
+           if(arr[root_index]>arr[index])
+           {
+               swap(arr[root_index],arr[index]);
+               heapify_up(arr,root_index);
+           }
+       }
+       T* Increase(T *arr)
+       {
+           T *new_arr=arr;
+           arr=new T[2*max_size];
+           max_size=2*max_size;
+           for(int i=0;i<nextIndex;i++)
+           {
+               arr[i]=new_arr[i];
+           }
+           return new_arr;
+       }
+       void heapify_down(T *arr,int index)
+       {
+           if(nextIndex<=index)
+               return ;
+           int left_index=(2*index)+1;
+           int right_index=(2*index)+2;
+           int swap_index=(arr[left_index]==min(arr[left_index],arr[right_index]))?left_index:right_index;
+           if(arr[index]>arr[swap_index])
+           {
+               swap(arr[index],arr[swap_index]);
+               heapify_down(arr,swap_index);
+           }
+       }
+
+    public:
+    void insert_element(T element)
+    {
+        if(nextIndex==max_size)
+        {
+            arr=Increase(arr);
+        }
+        arr[nextIndex]=element;
+        heapify_up(arr,nextIndex);
+        nextIndex++;
+    }
+    void get_min()
+    {
+        if(nextIndex==0)
+            return;
+        cout<<"The minimum element is:"<<arr[0];
+
+    }
+    T delete_min()
+    {
+       if(nextIndex==0)
+            return NULL;
+        swap(arr[0],arr[nextIndex-1]);
+        T ans=arr[nextIndex-1];
+        nextIndex--;
+        heapify_down(arr,0);
+        return ans;
+    }
+    void print()
+    {
+        for(int i=0;i<nextIndex;i++)
+        {
+            cout<<arr[i]<<" ";
+        }
+        cout<<endl;
+    }
+};
+int main()
+{
+     MinHeap<int> mh(10);
+     mh.insert_element(12);
+     mh.insert_element(6);
+     mh.insert_element(5);
+     mh.insert_element(100);
+     mh.insert_element(1);
+     mh.insert_element(9);
+     mh.insert_element(0);
+     mh.insert_element(14);
+     mh.insert_element(15);
+     mh.insert_element(15);
+     mh.insert_element(15);
+     mh.insert_element(15);
+     mh.insert_element(105);
+     mh.print();
+     mh.get_min();
+     int ans=mh.delete_min();
+     cout<<"The element deleted from heap is: "<<ans<<endl;
+     mh.print();
+     ans=mh.delete_min();
+     cout<<"The element deleted from heap is: "<<ans<<endl;
+     mh.print();
+     ans=mh.delete_min();
+     cout<<"The element deleted from heap is: "<<ans<<endl;
+     mh.print();
+}
