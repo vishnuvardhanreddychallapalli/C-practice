@@ -1,0 +1,137 @@
+#include<iostream>
+#include <string>
+using namespace std;
+class TrieNode
+{
+public:
+    /// The node should contain the data and since i am interested to store only alphabets i need one character and 26 pointers if trie node
+    char data;
+    TrieNode ** children;
+    bool isTerminal;
+    TrieNode(char data)
+    {
+        this->data=data;
+        children=new TrieNode*[26];
+        for(int i=0;i<26;i++)
+        {
+            children[i]=NULL;
+        }
+        isTerminal=false;
+    }
+    ~TrieNode()
+    {
+        delete children;
+    }
+
+};
+class Trie
+{
+    TrieNode *root;
+    public:
+    Trie()
+    {
+        root=new TrieNode('\0');
+    }
+    public:
+        void insert_word(TrieNode *root,string word)
+        {
+            if(word.size()==0)
+            {
+                root->isTerminal=true;
+                cout<<"Word_insertion sucessfull"<<endl;
+                return;
+            }
+            int index=word[0]-'a';
+            TrieNode *child;
+            if(root->children[index]==NULL)
+            {
+
+                child=new TrieNode(word[0]);
+                root->children[index]=child;
+            }
+            else
+            {
+                child=root->children[index];
+            }
+            insert_word(child,word.substr(1));
+        }
+    void delete_word(TrieNode *root,string word)
+    {
+        if(word.size()==0)
+        {
+            if(root->isTerminal==false)
+            {
+                cout<<"Word deletion is unsuccesful....."<<endl;
+                return;
+            }
+           cout<<"Word deletion is successful....."<<endl;
+           root->isTerminal=false;
+           return;
+        }
+        ///In delete word i have to pass through the path of the word....
+        int index=word[0]-'a';
+        if(root->children[index]==NULL)
+        {
+            /// This means you are trying to delete the word which is not present in the trie...
+              cout<<"Hey user the word you try to remove is not present in the dictionary you can removing other word.."<<endl;
+              return;
+        }
+        /// In case you find the letter then call recursion on the 2 nd letter...
+        TrieNode* child=root->children[index];
+        delete_word(child,word.substr(1));
+        /// Now i need to delete this node if this node do not have any children...
+        int counter=0;
+
+        for(int i=0;i<26;i++)
+        {
+            if(child->children[i]==NULL)
+            counter++;
+        }
+        if(counter==26)
+        {
+            delete child;
+        }
+        else
+        {
+            return;
+        }
+
+    }
+    bool search_word(TrieNode *root,string word)
+    {
+        if(word.size()==0)
+        {
+            if(root->isTerminal==true)
+            {
+                return true;
+            }
+        return false;
+        }
+      int index=word[0]-'a';
+      if(root->children[index]==NULL)
+        return false;
+      bool smallans=search_word(root->children[index],word.substr(1));
+      return smallans;
+    }
+
+    void insert_word(string word)
+    {
+        insert_word(root,word);
+    }
+    void delete_word(string word)
+    {
+          delete_word(root,word);
+    }
+    bool search_word(string word)
+    {
+        return search_word(root,word);
+    }
+};
+int main()
+{
+    Trie *root=new Trie();
+    root->insert_word("vishnu");
+    cout<<"Searching vishnu:   "<<root->search_word("vishnu")<<endl;
+    root->insert_word("vamsi");
+    root->delete_word("vishnu");
+}
