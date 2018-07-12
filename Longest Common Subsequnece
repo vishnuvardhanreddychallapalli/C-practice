@@ -1,0 +1,107 @@
+#include <iostream>
+#include <string>
+#include <algorithm>
+using namespace std;
+int lcs_dynamic(string a,string b,int **ans)
+{
+    for(int i=1;i<=a.size();i++)
+    {
+        for(int j=1;j<=b.size();j++)
+        {
+            if(a[i-1]==b[j-1])
+            {
+                ans[i][j]=1+ans[i-1][j-1];
+            }
+            else
+            {
+                ans[i][j]=max(ans[i-1][j],ans[i][j-1]);
+            }
+        }
+    }
+    return ans[a.size()][b.size()];
+}
+int lcs_better(string a,string b,int **ans)
+{
+    /// using memoization....
+     if(a.size()==0 || b.size()==0)
+     {
+         ans[a.size()][b.size()]=0;
+         return 0;
+     }
+     int len1=a.size();
+     int len2=b.size();
+     if(ans[len1][len2]!=-1)
+     {
+         return ans[len1][len2];
+     }
+     if(a[0]==b[0])
+     {
+         ans[len1-1][len2-1]=lcs_better(a.substr(1),b.substr(1),ans);
+         ans[len1][len2]=1+ans[len1-1][len2-1];
+     }
+     else
+     {
+         ans[len1-1][len2]=lcs_better(a.substr(1),b,ans);
+         ans[len1][len2-1]=lcs_better(a,b.substr(1),ans);
+         ans[len1][len2]=max(ans[len1-1][len2],ans[len1][len2-1]);
+     }
+     return ans[len1][len2];
+}
+int lcs(string a,string b)
+{
+      if(a.size()==0 || b.size()==0)
+               return 0;
+      if(a[0]==b[0])
+      {
+          return 1+lcs(a.substr(1),b.substr(1));
+      }
+    else 
+    {
+        return max(lcs(a,b.substr(1)),lcs(a.substr(1),b));
+    }
+}
+int main() {
+    string a="uzxxtyuiiohugfgabcd";
+    string b="zxxtyuuuytyyfbcd";
+    cout<<lcs(a,b)<<endl;
+    int **ans;
+    ans=new int*[a.size()+1];
+    for(int i=0;i<=a.size();i++)
+    {
+        ans[i]=new int[b.size()+1];
+        for(int j=0;j<=b.size();j++)
+        {
+            ans[i][j]=-1;
+        }
+    }
+    cout<<"The lcs better is :  "<<lcs_better(a,b,ans)<<endl;
+    cout<<"The matrix answer : "<<endl;
+     for(int i=0;i<=a.size();i++)
+    {
+        for(int j=0;j<=b.size();j++)
+        {
+           cout<<ans[i][j]<<" ";
+           ans[i][j]=-1;
+        }
+        cout<<endl;
+    }
+   for(int i=0;i<=a.size();i++)
+   {
+       ans[i][0]=0;
+   }
+   for(int j=0;j<=b.size();j++)
+   {
+       ans[0][j]=0;
+   }
+    cout<<lcs_dynamic(a,b,ans)<<endl;
+      for(int i=0;i<=a.size();i++)
+    {
+        for(int j=0;j<=b.size();j++)
+        {
+           cout<<ans[i][j]<<" ";
+           ans[i][j]=-1;
+        }
+        cout<<endl;
+    }
+    return 0;
+}
