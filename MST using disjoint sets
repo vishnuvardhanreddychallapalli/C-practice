@@ -1,0 +1,106 @@
+#include<iostream>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+class Edge
+{
+    public:
+    int vertex1;
+    int vertex2;
+    int weight;
+    Edge()
+    {
+
+    }
+    Edge(int vertex1,int vertex2,int weight)
+    {
+        this->vertex1=vertex1;
+        this->vertex2=vertex2;
+        this->weight=weight;
+    }
+};
+bool is_safe(Edge& curr_edge,int* parent)
+{
+    
+    int curr_vertex1=curr_edge.vertex1;
+    int curr_vertex2=curr_edge.vertex2;
+    int parent1=parent[curr_vertex1];
+    int parent2=parent[curr_vertex2];
+    // cout<<"The curr_vertex1 and vertex2 and parent are :"<<curr_vertex1<<" "<<curr_vertex2<<" "<<parent1<<" "<<parent2<<endl;
+    while(parent1!=parent[parent1])
+    {
+       
+        parent1=parent[parent1];
+    }
+    while(parent2!=parent[parent2])
+    {
+        
+        parent2=parent[parent2];
+    }
+    if(parent1==parent2)
+    {
+        return false;
+    }
+    else
+    {
+        // add this edge to output spanning tree...
+        parent[curr_vertex1]=max(curr_vertex1,curr_vertex2);
+        parent[curr_vertex2]=max(curr_vertex1,curr_vertex2);
+        return true;
+    }
+}
+int main()
+{
+    int V,E;
+    int count=0;
+    cin>>V>>E;
+    Edge* input=new Edge[E];
+    Edge* output=new Edge[V-1];
+    for(int i=0;i<E;i++)
+    {
+        int vertex1,vertex2,weight;
+        cin>>vertex1>>vertex2>>weight;
+        Edge curr_edge(vertex1,vertex2,weight);
+        input[i]=curr_edge;
+    }
+    sort(input,input+E,[](Edge &e1,Edge &e2)
+    { 
+        return e1.weight<e2.weight;
+    });
+
+    int* parent=new int[V];
+    for(int i=0;i<V;i++)
+    {
+        parent[i]=i;
+    }
+    int curr_input_index=0,curr_output_index=0;
+      while(count<V-1 && curr_input_index<E)
+      {
+
+        /// step 1: pick the edge and see whether this create a cycle or not :
+        /// if yes (creating cycle then discard the edge)
+        /// if no pick this edge and add it to the spanning tree....
+        ///so picking the first edge..
+        Edge &sample_edge=input[curr_input_index];
+        // check if sample edge creates a cycle..
+        if(is_safe(sample_edge,parent))
+        {
+               /// if the condition is safe then add this edge to the output spanning tree...
+               output[curr_output_index]=sample_edge;
+               curr_output_index++;
+               count++;
+        }
+        curr_input_index++; 
+       // cout<<"I came here..."<<endl;
+      }
+      for(int i=0;i<V-1;i++)
+      {
+        //  cout<<"hi"<<endl;
+          cout<<min(output[i].vertex1,output[i].vertex2)<<" "<<max(output[i].vertex1,output[i].vertex2)<<" "<<output[i].weight<<endl;
+      }
+
+    delete []parent;
+    delete []input;
+    delete []output;
+    return 0;
+}
