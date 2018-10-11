@@ -1,0 +1,92 @@
+#include<iostream>
+#include<algorithm>
+#include<vector>
+#include<unordered_set>
+using namespace std;
+vector<string> final_ans;
+unordered_set<string> duplicate_checker;
+bool is_valid_schedule(string my_schedule,int work_hours,int day_hours)
+{
+    int curr_schedule_sum=0;
+    /// This is the most important check needs to be done..
+    if(my_schedule.size()<7)
+            return false;
+    /// to check the validity of the schedule i need to make sure the sum of values in the string should be equal to the total no of work_hours..
+    for(int i=0;i<my_schedule.size();i++)
+    {
+        curr_schedule_sum=curr_schedule_sum+(my_schedule[i]-'0');
+    }
+    if(curr_schedule_sum==work_hours)
+    {
+        /// This is a valid schedule go ahead and add to your vector of strings..
+        return true;
+    }
+    else
+    {
+        ///This is a fake schedule do not let the employee follow this schedule..
+        return false;
+    }
+}
+void give_me_schedules(int work_hours,int day_hours,string pattern,string my_schedule)
+{
+       if(pattern.size()==0)
+       {
+           /// Before adding in to our final_vector i need to check two things :
+           /// 1.is my_schedule a valid schedule
+           /// 2.am i finding this schedule again to avoid duplicates..
+           bool checker=is_valid_schedule(my_schedule,work_hours,day_hours);
+           if(checker==true)
+           {
+             /// before adding i need to check whether this schedule already computed so that i can avoid duplication..
+             if(duplicate_checker.find(my_schedule)==duplicate_checker.end())
+             {
+                 /// This says that i do not have this my_schedule in my set so i can add this to my vector and also add this the unordered set to find next upcoming duplicates..
+                 duplicate_checker.insert(my_schedule);
+                 final_ans.push_back(my_schedule);
+                /// cout<<my_schedule<<endl;
+             }
+             /// if the schedule is already present in the set then do not add to your vector...
+           }
+           /// if the schedule is invalid do not even consider for further checking....
+       }
+       /// OKK MY Range to fill the question marks would be from 0 to day_hours...
+       for(int i=0;i<pattern.size();i++)
+       {
+           if(pattern[i]!='?')
+           {
+               ///Then do not go down the line please continue before that update my_schedule
+               my_schedule=my_schedule+""+pattern[i];
+               give_me_schedules(work_hours,day_hours,pattern.substr(i+1),my_schedule);
+               continue;
+           }
+           if(pattern[i]=='?')
+           {
+               /// Then here you need to replace your schedule values they range from 0 to day_hours..
+               for(int j=0;j<=day_hours;j++)
+               {
+                   /// its our responsibilty to replace this ? by a value j
+                   my_schedule=my_schedule+""+to_string(j);
+                   give_me_schedules(work_hours,day_hours,pattern.substr(i+1),my_schedule);
+                   ///This is the back tracking step need to be done for further replacements else our optimal schedule length cross beyond 7..
+                   my_schedule=my_schedule.substr(0,my_schedule.size()-1);
+               }
+           }
+       }
+}
+int main()
+{
+    int work_hours=56,day_hours=8;
+    string pattern;
+    /// Remember 1.the length of the pattern should be 7 and any character in the string should range from 0 to day_hours should not exceed day_hours
+   // cin>>work_hours>>day_hours;
+    /// Assuming that the hacker rank gives me the right pattern with some Question marks as a token of replacement i can go ahead and solve this problem
+    pattern="???8???";
+    ///Return all the pair of strings...
+     string empty_one="";
+     give_me_schedules(work_hours,day_hours,pattern,empty_one);
+    for(int i=0;i<final_ans.size();i++)
+    {
+        cout<<final_ans[i]<<endl;
+    }
+    return 0;
+}
